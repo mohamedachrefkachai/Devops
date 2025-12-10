@@ -6,7 +6,7 @@ pipeline {
             steps {
                 // Le repo est public, pas besoin de credentials
                 git branch: "main",
-                    url: "https://github.com/Yassmineouadday/student-management.git"
+                    url: "https://github.com/mohamedachrefkachai/Devops.git"
             }
         }
 
