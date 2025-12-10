@@ -18,7 +18,7 @@ pipeline {
 
         stage("Build Docker Image") {
             steps {
-                sh "docker build -t yasswdy/student-management:latest ."
+                sh "docker build -t mohamedachref/student-management:latest ."
             }
         }
 
@@ -27,7 +27,7 @@ pipeline {
                 // Utilise tes credentials Docker Hub
                 withCredentials([usernamePassword(credentialsId: 'DOCKERHUB_CREDENTIALS', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh 'docker push yasswdy/student-management:latest'
+                    sh 'docker push mohamedachref/student-management:latest'
                 }
             }
         }
