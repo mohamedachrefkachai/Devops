@@ -1,44 +1,36 @@
 pipeline {
     agent any
 
-    stages {
-        stage("Checkout") {
-            steps {
-                // Le repo est public, pas besoin de credentials
-                git branch: "main",
-                    url: "https://github.com/mohamedachrefkachai/Devops.git"
-            }
-        }
-
-        stage("Build") {
-            steps {
-                sh "mvn clean package -DskipTests"
-            }
-        }
-
-        stage("Build Docker Image") {
-            steps {
-                sh "docker build -t mohamedachref/student-management:latest ."
-            }
-        }
-
-        stage("Push Docker Image") {
-            steps {
-                // Utilise tes credentials Docker Hub
-                withCredentials([usernamePassword(credentialsId: 'DOCKERHUB_CREDENTIALS', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
-                    sh 'docker push mohamedachref/student-management:latest'
-                }
-            }
-        }
+    tools {
+        jdk 'JAVA_HOME'
+        maven 'M2_HOME'
     }
 
-    post {
-        success {
-            echo "Build et push Docker rÃ©ussis ! "
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: 'main',
+                    url: 'https://github.com/mohamedachrefkachai/Devops.git'
+            }
         }
-        failure {
-            echo "Build Ã©chouÃ© "
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean install -DskipTests'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo 'Déploiement terminé !'
+            }
         }
     }
 }
