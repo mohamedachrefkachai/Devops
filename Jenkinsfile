@@ -15,22 +15,50 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build Maven') {
             steps {
-                sh 'mvn clean install -DskipTests'
+                sh 'mvn clean package -DskipTests'
             }
         }
 
-        stage('Test') {
+        stage('Run Tests') {
             steps {
                 sh 'mvn test'
             }
         }
 
-        stage('Deploy') {
+        stage('Build Docker Image') {
             steps {
-                echo 'Déploiement terminé !'
+                sh '''
+                    sudo docker build -t achref/devops-app:latest .
+                '''
             }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'DOCKERHUB_CREDENTIALS',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | sudo docker login -u "$DOCKER_USER" --password-stdin
+                        sudo docker push achref/devops-app:latest
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline exécuté avec succès ✔️ Docker push réussi."
+        }
+        failure {
+            echo "Le pipeline a échoué ❌"
         }
     }
 }
