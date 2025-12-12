@@ -1,21 +1,16 @@
 pipeline {
     agent any
 
-    tools {
-           jdk 'JAVA_HOME'
-           maven 'M2_HOME'       
-    }
-
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                sh './mvnw clean package -DskipTests'
+                git 'https://github.com/mohamedachrefkachai/Devops.git'
             }
         }
 
-        stage('Archive') {
+        stage('Build') {
             steps {
-                archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
+                sh './mvnw clean package -DskipTests'
             }
         }
     }
