@@ -70,7 +70,7 @@ pipeline {
             steps {
                 sh '''
                     echo "Deploying to Kubernetes..."
-                    kubectl apply -f k8s/
+                    kubectl apply -f k8s/ --validate=false
                 '''
             }
         }
