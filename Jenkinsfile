@@ -64,11 +64,23 @@ pipeline {
                 }
             }
         }
+
+        /* ======= NOUVEAU STAGE ======= */
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                    echo "Deploying to Kubernetes..."
+                    kubectl apply -f k8s/
+                '''
+            }
+        }
+        /* ============================ */
+
     }
 
     post {
         success {
-            echo "✅ Build Maven + Docker + Push Docker Hub réussis"
+            echo "✅ Pipeline CI/CD complet : Maven + Docker + Kubernetes"
         }
         failure {
             echo "❌ Échec du pipeline"
