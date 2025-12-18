@@ -2,9 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "tonusername/spring-devops-app"
+        DOCKER_IMAGE = "achrefkachai/spring-devops-app"
         DOCKER_TAG   = "latest"
-        DOCKER_CREDS = "dockerhub-creds"
     }
 
     stages {
@@ -44,20 +43,24 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
-                }
+                sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                script {
-                    sh """
-                    echo "Login to Docker Hub"
-                    docker login -u \$DOCKER_USERNAME -p \$DOCKER_PASSWORD
-                    docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
-                    """
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'dockerhub-creds',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+                    sh '''
+                        echo "Login to Docker Hub"
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                    '''
                 }
             }
         }
@@ -65,7 +68,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ Build Maven + Docker + Push réussis"
+            echo "✅ Build Maven + Docker + Push Docker Hub réussis"
         }
         failure {
             echo "❌ Échec du pipeline"
